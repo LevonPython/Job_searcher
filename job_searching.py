@@ -4,10 +4,10 @@ import csv
 
 
 class JobsScrapping:
-    __slots__ = "url", "hr_url", 'data_csv', 'keyword'
+    __slots__ = "staff_url", "hr_url", 'data_csv', 'keyword'
 
-    def __init__(self, url, hr_url, data_csv, keyword):
-        self.url = url
+    def __init__(self, staff_url, hr_url, data_csv, keyword):
+        self.staff_url = staff_url
         self.hr_url = hr_url
         self.data_csv = data_csv
         self.keyword = keyword
@@ -15,17 +15,17 @@ class JobsScrapping:
     def csv_file_open(self):
         with open(self.data_csv, 'w', newline='', encoding="utf-8") as csv_file:
             csv_writer = csv.DictWriter(csv_file, fieldnames=['title', 'job_title_eng', 'deadline', 'employment_term',
-                                                                  'job_type', 'category', 'location', 'job_link'])
+                                                              'job_type', 'category', 'location', 'job_link'])
             csv_writer.writeheader()
             self.staff_am_scrap(csv_writer, 15)
             self.hr_am_scrap(csv_writer, 32)
 
     def staff_am_scrap(self, csv_writer, step=50,
-                  title='', deadline='', employment_term='',
-                  job_type='', category='', location=''):
+                       title='', deadline='', employment_term='',
+                       job_type='', category='', location=''):
 
         for page in range(0, step):
-            source = requests.get(self.url.format(page + 1)).text
+            source = requests.get(self.staff_url.format(page + 1)).text
             soup = BeautifulSoup(source, 'lxml')
             job_list = soup.find_all('div', attrs={'id': 'w0', 'class': 'list-view'})
             for more in job_list:
@@ -88,17 +88,25 @@ class JobsScrapping:
                         continue
 
     def hr_am_scrap(self, csv_writer, step=50):
-        print("Now working on hr.am scrapping")
+        source = requests.get(self.hr_url).text
+        soup = BeautifulSoup(source, 'lxml')
+        # job = soup.find('div', class_="logo")
+        # js , can't open the job content
+        # opens = requests.get(job)
+        # so = BeautifulSoup(opens, 'lxml')
+        # title = job_list.find_all('div', class_="title")
+        #     print(title)
+        # print(job)
 
 
 if __name__ == "__main__":
-    Url = "https://staff.am/en/jobs?page={}&per-page=50"
-    hr_url = "http://hr.am/"
+    Staff_url = "https://staff.am/en/jobs?page={}&per-page=50"
+    Hr_url = "http://hr.am/"
     # Keyword = 'intern'
     # Keyword = 'accountant'
     Keyword = 'python'
     # Keyword = 'administrator'
     # Keyword = input("Please fill position: ")
     Data_csv = f"{Keyword}_Jobs.csv"
-    res = JobsScrapping(Url, hr_url, Data_csv, Keyword)
+    res = JobsScrapping(Staff_url, Hr_url, Data_csv, Keyword)
     res.csv_file_open()

@@ -8,12 +8,14 @@ class Exceptions(Exception):
 
 
 class JobsScrapping:
-    __slots__ = "staff_url", "jobdinfer_url", "hr_url", 'data_csv', 'keyword'
+    __slots__ = "staff_url", "jobdinfer_url", "i_job", "hr_url", "careercenter", 'data_csv', 'keyword'
 
-    def __init__(self, staff_url, jobdinfer_url, hr_url, data_csv, keyword):
+    def __init__(self, staff_url, jobdinfer_url, i_job, hr_url, careercenter, data_csv, keyword):
         self.staff_url = staff_url
         self.jobdinfer_url = jobdinfer_url
+        self.i_job = i_job
         self.hr_url = hr_url
+        self.careercenter = careercenter
         self.data_csv = data_csv
         self.keyword = keyword
 
@@ -23,13 +25,15 @@ class JobsScrapping:
                 'title', 'job_title_eng', 'company_name', 'deadline', 'employment_term', 'job_type',
                 'category', 'location', 'job_link'])
             csv_writer.writeheader()
-            self.staff_am_scrap(csv_writer, 15)
+            # self.staff_am_scrap(csv_writer, 15)
             # self.hr_am_scrap(csv_writer, 32)
-            self.jobfinder_am_scrap(csv_writer)
+            # self.jobfinder_am_scrap(csv_writer)
+            # self.i_job_scrap(csv_writer)
+            self.careercenter_am_scrap(csv_writer)
 
     # ----------------------------- S T A F F . A M -----------------------------------------------------------
     def staff_am_scrap(self, csv_writer, step=50,
-                       title='', company_name='', deadline='', employment_term='',
+                       title='', deadline='', employment_term='',
                        job_type='', category='', location=''):
 
         for page in range(0, step):
@@ -57,6 +61,7 @@ class JobsScrapping:
                             #         print(f"{self.keyword} keyword matches in"
                             #               f"{job_title_eng} required position qualifications")
                             # grap necessary info from each announcement
+                            company_name = url_soup.find('h1', class_="job_company_title").text
                             title_origin = url_soup.find_all('div', class_="col-lg-8")
                             for k in range(len(title_origin)):
                                 title_arm = title_origin[k].h2
@@ -174,6 +179,13 @@ class JobsScrapping:
                 except Exception as err:
                     Exceptions(f"ERROR {err}")
                     continue
+    # ----------------------------- I J O B . A M -------------------------------------------------------
+    def i_job_scrap(self, csv_writer):
+        source = requests.get(self.i_job.format(self.keyword)).text
+        soup = BeautifulSoup(source, 'html.parser')
+        link = self.i_job.format(self.keyword)
+        # print(link)
+        print(soup.prettify())
 
     # ----------------------------- H R . A M -----------------------------------------------------------
     def hr_am_scrap(self, csv_writer, step=50):
@@ -189,16 +201,23 @@ class JobsScrapping:
         #     print(title)
         # print(job)
 
+    def careercenter_am_scrap(self, csv_writer):
+        source = requests.get(self.careercenter).text
+        soup = BeautifulSoup(source, 'html.parser')
+        page = soup.find('body')
+        print(page)
+
 
 if __name__ == "__main__":
     Staff_url = "https://staff.am/en/jobs?page={}&per-page=50"
     Jobdinfer_url = "http://jobfinder.am/default.aspx"
     Hr_url = "http://hr.am/"
-    # Keyword = 'intern'
-    # Keyword = 'accountant'
+    I_job = "http://ijob.am/job-list/?search_keywords={}" \
+            "&search_location=&search_categories%5B%5D=&submit=Search&filter_job_type%5B%5D="
+    Careercenter = "https://careercenter.am/"
+    # hint: keywords examples: intern, accountant, administrator, python
     Keyword = 'python'
-    # Keyword = 'administrator'
     # Keyword = input("Please fill position: ")
     Data_csv = f"{Keyword}_Jobs.csv"
-    res = JobsScrapping(Staff_url, Jobdinfer_url, Hr_url, Data_csv, Keyword)
+    res = JobsScrapping(Staff_url, Jobdinfer_url, I_job, Hr_url, Careercenter, Data_csv, Keyword)
     res.csv_file_open()

@@ -11,14 +11,15 @@ class Exceptions(Exception):
 
 
 class JobsScrapping:
-    __slots__ = "staff_url", "jobfinder_url", "i_job", "hr_url", "careercenter", 'data_csv', 'keyword'
+    __slots__ = "staff_url", "jobfinder_url", "i_job", "hr_url", "careercenter", "myjob", 'data_csv', 'keyword'
 
-    def __init__(self, staff_url, jobfinder_url, i_job, hr_url, careercenter, data_csv, keyword):
+    def __init__(self, staff_url, jobfinder_url, i_job, hr_url, careercenter, myjob, data_csv, keyword):
         self.staff_url = staff_url
         self.jobfinder_url = jobfinder_url
         self.i_job = i_job
         self.hr_url = hr_url
         self.careercenter = careercenter
+        self.myjob = myjob
         self.data_csv = data_csv
         self.keyword = keyword
 
@@ -28,19 +29,15 @@ class JobsScrapping:
                 'title', 'job_title_eng', 'company_name', 'deadline', 'employment_term', 'job_type',
                 'category', 'location', 'job_link'])
             csv_writer.writeheader()
-            self.staff_am_scrap(csv_writer, 15)
-            self.hr_am_scrap(csv_writer)
-            self.jobfinder_am_scrap(csv_writer)
-            self.i_job_scrap(csv_writer)
-            self.careercenter_am_scrap(csv_writer)
+            # self.staff_am_scrap(csv_writer, 15)
+            # self.hr_am_scrap(csv_writer)
+            # self.jobfinder_am_scrap(csv_writer)
+            # self.i_job_scrap(csv_writer)
+            # self.careercenter_am_scrap(csv_writer)
+            self.my_job_am(csv_writer)
             finished = time.time()
             print(f"Search finished\nTime spent to search {finished - started:.2f} seconds"
                   f" or {(finished - started)/60:.2f} minutes")
-
-            self.hr_am_scrap(csv_writer)
-            self.jobfinder_am_scrap(csv_writer)
-            self.i_job_scrap(csv_writer)
-            self.careercenter_am_scrap(csv_writer)
 
     # ----------------------------- S T A F F . A M -----------------------------------------------------------
     def staff_am_scrap(self, csv_writer, step=50,
@@ -311,6 +308,52 @@ class JobsScrapping:
                         Exceptions(f"ERROR {err}")
                         continue
 
+    # ----------------------------- M Y J O B . A M -----------------------------------------------------------
+    def my_job_am(self, csv_writer, employment_term='', job_type='', category=''):
+        page_num = 1
+        source = requests.get(self.myjob.format(page_num)).text
+        chek_list = []
+        stop_here = 'double link'
+        scrap_end = ''
+        while source:
+            try:
+                soup = BeautifulSoup(source, 'lxml')
+                for job in soup.find('div', class_="jobPageContainer"):
+                    job_link = f"https://www.myjob.am/{job['href']}"
+                    # check if the next page is not loaded back again to the first page
+                    if job_link not in chek_list:
+                        chek_list.append(job_link)
+                        title = job.find('div', class_="shortJobPosition").text
+                        if self.keyword in title.lower():
+                            print("Matches")
+                            job_title_eng = title
+                            company_name = job.find('div', class_='shortJobCompany').text
+                            deadline = job.find('div', class_="shortJobDeadline").text
+                            location = job.find('div', class_="shortJobRightPart").text
+                            jobs_info = [{'title': title,
+                                          'job_title_eng': job_title_eng,
+                                          'company_name': company_name,
+                                          'deadline': deadline,
+                                          'employment_term': employment_term,
+                                          'job_type': job_type,
+                                          'category': category,
+                                          'location': location,
+                                          'job_link': job_link,
+                                          }]
+                            for jobs in jobs_info:
+                                csv_writer.writerow(jobs)
+                    else:
+                        scrap_end = stop_here
+            except Exception as err:
+                print(f"ERROR {err}")
+                break
+
+            if scrap_end == stop_here:
+                break
+            page_num += 1
+            source = requests.get(self.myjob.format(page_num)).text
+            print(page_num)
+
 
 if __name__ == "__main__":
     Staff_url = "https://staff.am/en/jobs?page={}&per-page=50"
@@ -319,9 +362,11 @@ if __name__ == "__main__":
     I_job = "http://ijob.am/job-list/?search_keywords={}" \
             "&search_location=&search_categories%5B%5D=&submit=Search&filter_job_type%5B%5D="
     Careercenter = "https://careercenter.am/ccidxann.php"
+    my_job = "https://www.myjob.am/?pg={}"
+    My_job_url = "https://www.myjob.am/?pg={}"
     Keyword = input("Hint: keywords examples: intern, accountant, lawyer, engineer,"
                     " administrator, python\n\nPlease fill position:  ")
     started = time.time()
     Data_csv = f"{Keyword}_Jobs.csv"
-    res = JobsScrapping(Staff_url, Jobfinder_url, I_job, Hr_url, Careercenter, Data_csv, Keyword)
+    res = JobsScrapping(Staff_url, Jobfinder_url, I_job, Hr_url, Careercenter, My_job_url, Data_csv, Keyword)
     res.csv_file_open()

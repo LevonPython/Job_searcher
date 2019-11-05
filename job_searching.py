@@ -29,11 +29,11 @@ class JobsScrapping:
                 'title', 'job_title_eng', 'company_name', 'deadline', 'employment_term', 'job_type',
                 'category', 'location', 'job_link'])
             csv_writer.writeheader()
-            # self.staff_am_scrap(csv_writer, 15)
-            # self.hr_am_scrap(csv_writer)
-            # self.jobfinder_am_scrap(csv_writer)
-            # self.i_job_scrap(csv_writer)
-            # self.careercenter_am_scrap(csv_writer)
+            self.staff_am_scrap(csv_writer, 15)
+            self.hr_am_scrap(csv_writer)
+            self.jobfinder_am_scrap(csv_writer)
+            self.i_job_scrap(csv_writer)
+            self.careercenter_am_scrap(csv_writer)
             self.my_job_am(csv_writer)
             finished = time.time()
             print(f"Search finished\nTime spent to search {finished - started:.2f} seconds"

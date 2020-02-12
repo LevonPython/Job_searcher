@@ -38,7 +38,21 @@ class JobsScrapping:
             finished = time.time()
             print(f"Minutes spent to search {(finished - started)/60:.2f}")
 
-    # ----------------------------- S T A F F . A M -----------------------------------------------------------
+    def csv_writing(self, title, job_title_eng, company_name, deadline, employment_term, job_type,
+                    category, location, job_link, csv_writer):
+        jobs_info = [{'title': title,
+                      'job_title_eng': job_title_eng,
+                      'company_name': company_name,
+                      'deadline': deadline,
+                      'employment_term': employment_term,
+                      'job_type': job_type,
+                      'category': category,
+                      'location': location,
+                      'job_link': job_link,
+                      }]
+        for jobs in jobs_info:
+            csv_writer.writerow(jobs)
+
     def staff_am_scrap(self, csv_writer, step=50,
                        title='', deadline='', employment_term='',
                        job_type='', category='', location=''):
@@ -88,23 +102,12 @@ class JobsScrapping:
                                     category = elem_scd[4].strip()
                                 elif elem_scd[4] == "Location:":
                                     location = elem_scd[5].strip()
-                            jobs_info = [{'title': title,
-                                          'job_title_eng': job_title_eng,
-                                          'company_name': company_name,
-                                          'deadline': deadline,
-                                          'employment_term': employment_term,
-                                          'job_type': job_type,
-                                          'category': category,
-                                          'location': location,
-                                          'job_link': job_link,
-                                          }]
-                            for jobs in jobs_info:
-                                csv_writer.writerow(jobs)
+                            self.csv_writing(title, job_title_eng, company_name, deadline, employment_term, job_type,
+                                             category, location, job_link, csv_writer)
                     except Exception as err:
                         Exceptions(f"ERROR {err}")
                         continue
 
-    # ----------------------------- J O B F I N D E R  . A M ---------------------------------------------------------
     def jobfinder_am_scrap(self, csv_writer, job_title_eng=''):
         source = requests.get(self.jobfinder_url).text
         soup = BeautifulSoup(source, "lxml")
@@ -160,23 +163,12 @@ class JobsScrapping:
                         employment_term = "Permanent"
                     else:
                         employment_term = "Other"
-                    jobs_info = [{'title': title,
-                                  'job_title_eng': job_title_eng,
-                                  'company_name': company_name,
-                                  'deadline': deadline,
-                                  'employment_term': employment_term,
-                                  'job_type': job_type,
-                                  'category': category,
-                                  'location': location,
-                                  'job_link': job_link,
-                                  }]
-                    for jobs in jobs_info:
-                        csv_writer.writerow(jobs)
+                    self.csv_writing(title, job_title_eng, company_name, deadline, employment_term, job_type,
+                                     category, location, job_link, csv_writer)
             except Exception as err:
                 Exceptions(f"ERROR {err}")
                 continue
 
-    # ----------------------------- I J O B . A M -------------------------------------------------------
     def i_job_scrap(self, csv_writer, employment_term='', category=''):
         driver = webdriver.Chrome()
         driver.get(self.i_job.format(self.keyword))
@@ -192,20 +184,9 @@ class JobsScrapping:
             location = job_info[2]
             job_type = job_info[3]
             deadline = job_info[-1][7:].strip()
-            jobs_info = [{'title': title,
-                          'job_title_eng': job_title_eng,
-                          'company_name': company_name,
-                          'deadline': deadline,
-                          'employment_term': employment_term,
-                          'job_type': job_type,
-                          'category': category,
-                          'location': location,
-                          'job_link': job_link,
-                          }]
-            for jobs in jobs_info:
-                csv_writer.writerow(jobs)
+            self.csv_writing(title, job_title_eng, company_name, deadline, employment_term, job_type,
+                             category, location, job_link, csv_writer)
 
-    # ----------------------------- H R . A M -----------------------------------------------------------
     def hr_am_scrap(self, csv_writer, job_title_eng='', employment_term='',
                     job_type='', category='', location=''):
         driver = webdriver.Chrome()
@@ -227,18 +208,8 @@ class JobsScrapping:
                         job_link = find_link.get_attribute('href')
                         company_name = desc[-3]
                         deadline = desc[-1]
-                        jobs_info = [{'title': title,
-                                      'job_title_eng': job_title_eng,
-                                      'company_name': company_name,
-                                      'deadline': deadline,
-                                      'employment_term': employment_term,
-                                      'job_type': job_type,
-                                      'category': category,
-                                      'location': location,
-                                      'job_link': job_link,
-                                      }]
-                        for jobs in jobs_info:
-                            csv_writer.writerow(jobs)
+                        self.csv_writing(title, job_title_eng, company_name, deadline, employment_term, job_type,
+                                         category, location, job_link, csv_writer)
                 page_num += 1
                 next_page = driver.find_element_by_css_selector(
                     'div#vacancy_pagination > a:nth-child({})'.format(page_num))
@@ -248,7 +219,6 @@ class JobsScrapping:
                 print(f"pages ended -- {err}")
                 break
 
-    # ------------------------ C A R E E R C E N T E R . A M ----------------------------------------------
     def careercenter_am_scrap(self, csv_writer, employment_term='', job_type='',
                               category='', location=''):
         source = requests.get(self.careercenter)
@@ -286,23 +256,12 @@ class JobsScrapping:
                                 location = elem.text
                             elif elem.text.startswith("DURATION:"):
                                 employment_term = elem.text.split("DURATION:  ")[1].strip()
-                            jobs_info = [{'title': title,
-                                          'job_title_eng': job_title_eng,
-                                          'company_name': company_name,
-                                          'deadline': deadline,
-                                          'employment_term': employment_term,
-                                          'job_type': job_type,
-                                          'category': category,
-                                          'location': location,
-                                          'job_link': job_link,
-                                          }]
-                            for jobs in jobs_info:
-                                csv_writer.writerow(jobs)
+                            self.csv_writing(title, job_title_eng, company_name, deadline, employment_term, job_type,
+                                             category, location, job_link, csv_writer)
                 except Exception as err:
                     Exceptions(f"ERROR {err}")
                     continue
 
-    # ----------------------------- M Y J O B . A M -----------------------------------------------------------
     def my_job_am(self, csv_writer, employment_term='', job_type=''):
         page_num = 1
         source = requests.get(self.myjob.format(page_num)).text
@@ -329,18 +288,8 @@ class JobsScrapping:
                         deadline = find_category.split(location)[1]
                         for i in job_soup.find_all('div', class_="fullJobTextLong"):
                             if self.keyword in i.text.lower():
-                                jobs_info = [{'title': title,
-                                              'job_title_eng': job_title_eng,
-                                              'company_name': company_name,
-                                              'deadline': deadline,
-                                              'employment_term': employment_term,
-                                              'job_type': job_type,
-                                              'category': category,
-                                              'location': location,
-                                              'job_link': job_link,
-                                              }]
-                                for jobs in jobs_info:
-                                    csv_writer.writerow(jobs)
+                                self.csv_writing(title, job_title_eng, company_name, deadline, employment_term,
+                                                 job_type, category, location, job_link, csv_writer)
                     else:
                         scrap_end = stop_here
             except Exception as err:

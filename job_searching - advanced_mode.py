@@ -53,9 +53,9 @@ class JobsScrapping:
         for jobs in jobs_info:
             csv_writer.writerow(jobs)
 
-    def staff_am_scrap(self, csv_writer, step=50,
-                       title='', deadline='', employment_term='',
+    def staff_am_scrap(self, csv_writer, step=50, title='', deadline='', employment_term='',
                        job_type='', category='', location=''):
+        print("started ...")
 
         for page in range(0, step):
             source = requests.get(self.staff_url.format(page + 1)).text
@@ -107,6 +107,7 @@ class JobsScrapping:
                     except Exception as err:
                         Exceptions(f"ERROR {err}")
                         continue
+        print("staff.am scraped successfully")
 
     def jobfinder_am_scrap(self, csv_writer, job_title_eng=''):
         source = requests.get(self.jobfinder_url).text
@@ -168,6 +169,7 @@ class JobsScrapping:
             except Exception as err:
                 Exceptions(f"ERROR {err}")
                 continue
+        print("jobfinder.am scraped successfully")
 
     def i_job_scrap(self, csv_writer, employment_term='', category=''):
         driver = webdriver.Chrome()
@@ -186,6 +188,7 @@ class JobsScrapping:
             deadline = job_info[-1][7:].strip()
             self.csv_writing(title, job_title_eng, company_name, deadline, employment_term, job_type,
                              category, location, job_link, csv_writer)
+        print("ijob.am scraped successfully")
 
     def hr_am_scrap(self, csv_writer, job_title_eng='', employment_term='',
                     job_type='', category='', location=''):
@@ -218,6 +221,7 @@ class JobsScrapping:
             except Exception as err:
                 print(f"pages ended -- {err}")
                 break
+        print("hr.am scraped successfully")
 
     def careercenter_am_scrap(self, csv_writer, employment_term='', job_type='',
                               category='', location=''):
@@ -261,7 +265,7 @@ class JobsScrapping:
                 except Exception as err:
                     Exceptions(f"ERROR {err}")
                     continue
-
+        print("careercenter.am scraped successfully")
     def my_job_am(self, csv_writer, employment_term='', job_type=''):
         page_num = 1
         source = requests.get(self.myjob.format(page_num)).text
@@ -301,6 +305,7 @@ class JobsScrapping:
             page_num += 1
             source = requests.get(self.myjob.format(page_num)).text
             print(page_num)
+        print("myjob.am scraped successfully")
 
 
 if __name__ == "__main__":

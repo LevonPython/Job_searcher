@@ -4,11 +4,97 @@ import csv
 from requests_html import HTMLSession
 from selenium import webdriver
 import time
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
+import os
+import re
 
 
 class Exceptions(Exception):
     pass
 
+def mail_checker(email):
+    regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
+    # pass the regualar expression
+    # and the string in search() method
+    if (re.search(regex, email)):
+        return "Valid Email"
+    else:
+        return "Invalid Email"
+
+class SendToMail:
+
+    def send_mail(self, data_csv, keyword, e_mail_info):
+        fromaddr = "levon.python@gmail.com"
+        toaddr = e_mail_info #"levoncdpf@gmail.com"
+        toaddr2 = "lidamuradyan01@gmail.com"
+
+        # instance of MIMEMultipart
+        msg = MIMEMultipart()
+
+        # storing the senders email address
+        msg['From'] = fromaddr
+
+        # storing the receivers email address
+        msg['To'] = toaddr
+        msg['To'] = toaddr2
+
+        # storing the subject
+        msg['Subject'] = f"Scrapped Data for {keyword}"
+
+        # string to store the body of the mail
+        body = "Here is the attached file for the specified position "
+
+        # attach the body with the msg instance
+        msg.attach(MIMEText(body, 'plain'))
+
+        # open the file to be sent
+        script_dir = os.path.dirname(__file__)
+        file = os.path.join(script_dir, data_csv)
+        attachment = open(file, "rb")
+
+        # instance of MIMEBase and named as p
+        p = MIMEBase('application', 'octet-stream')
+
+        # To change the payload into encoded formsaqsdfghjkl;'
+        p.set_payload(attachment.read())
+
+        # encode into base64
+        encoders.encode_base64(p)
+        p.add_header(f"Content-Disposition", f"attachment; filename={data_csv}")
+        # p.add_header('Content-Disposition', "attachment; filename= %s" % filename)
+
+        # attach the instance 'p' to instance 'msg'
+        msg.attach(p)
+
+        # creates SMTP session
+        s = smtplib.SMTP('smtp.gmail.com', 587)
+
+        # start TLS for security
+        s.starttls()
+
+        # Authentication
+        s.login(fromaddr, "lqglrrtepepxamvz")
+
+        # for specific password
+        # https://myaccount.google.com/security?rapt=AEjHL4PlAh6rv38PgIokqo4MNOKXlPRfjcyZlgvwF4by81rOQ8XUhwWJnn12AzOa5
+        # VS-vGqITVfOyHZQzutJNc-grjyjZtI4sQ
+
+        print("login success")
+        # Converts the Multipart msg into a string
+        text = msg.as_string()
+
+        # sending the mail
+        s.sendmail(fromaddr, toaddr, text)
+        s.sendmail(fromaddr, toaddr2, text)
+
+        # terminating the session
+        s.quit()
+
+        print("sent . . .")
 
 class JobsScrapping:
     __slots__ = "staff_url", "jobfinder_url", "i_job", "hr_url", "careercenter", "myjob", 'data_csv', 'keyword'
@@ -30,14 +116,15 @@ class JobsScrapping:
                 'category', 'location', 'job_link'])
             csv_writer.writeheader()
             self.staff_am_scrap(csv_writer, 15)
-            self.hr_am_scrap(csv_writer)
-            self.jobfinder_am_scrap(csv_writer)
-            self.i_job_scrap(csv_writer)
-            self.careercenter_am_scrap(csv_writer)
-            self.my_job_am(csv_writer)
+            # self.hr_am_scrap(csv_writer)
+            # self.jobfinder_am_scrap(csv_writer)
+            # self.i_job_scrap(csv_writer)
+            # self.careercenter_am_scrap(csv_writer)
+            # self.my_job_am(csv_writer)
             finished = time.time()
             print(f"Search finished\nTime spent to search {finished - started:.2f} seconds"
                   f" or {(finished - started)/60:.2f} minutes")
+
 
     def csv_writing(self, title, job_title_eng, company_name, deadline, employment_term, job_type,
                     category, location, job_link, csv_writer):
@@ -317,7 +404,20 @@ if __name__ == "__main__":
     My_job_url = "https://www.myjob.am/?pg={}"
     Keyword = input("Hint: keywords examples: intern, accountant, lawyer, engineer,"
                     " administrator, python\n\nPlease fill position:  ")
+    e_mail_info = ""
+    while True:
+        e_mail_info = input("Please write your e-mail to send already scrapped data to:\n")
+        try:
+            if mail_checker(e_mail_info) == "Valid Email":
+                break
+        except:
+            print("Please write correct e-mail\n")
+
+            continue
+
     started = time.time()
     Data_csv = f"{Keyword}_Jobs.csv"
     res = JobsScrapping(Staff_url, Jobfinder_url, I_job, Hr_url, Careercenter, My_job_url, Data_csv, Keyword)
     res.csv_file_open()
+    sending = SendToMail()
+    sending.send_mail(Data_csv, Keyword, e_mail_info)

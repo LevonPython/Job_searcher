@@ -16,87 +16,88 @@ import re
 class Exceptions(Exception):
     pass
 
+
 def mail_checker(email):
-    regex = '^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$'
-    # pass the regualar expression
-    # and the string in search() method
-    if (re.search(regex, email)):
+    regex = r"^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$"
+    # pass the regualar expression and the string in search() method
+    if re.search(regex, email):
         return "Valid Email"
     else:
         return "Invalid Email"
 
-class SendToMail:
 
-    def send_mail(self, data_csv, keyword, e_mail_info):
-        fromaddr = "levon.python@gmail.com"
-        toaddr = e_mail_info #"levoncdpf@gmail.com"
-        toaddr2 = "lidamuradyan01@gmail.com"
+def send_mail(data_csv, keyword, e_mail_data):
+    fromaddr = "levon.python@gmail.com"
+    toaddr = e_mail_data    # "levoncdpf@gmail.com"
+    toaddr2 = "lidamuradyan01@gmail.com"
 
-        # instance of MIMEMultipart
-        msg = MIMEMultipart()
+    # instance of MIMEMultipart
+    msg = MIMEMultipart()
 
-        # storing the senders email address
-        msg['From'] = fromaddr
+    # storing the senders email address
+    msg['From'] = fromaddr
 
-        # storing the receivers email address
-        msg['To'] = toaddr
-        msg['To'] = toaddr2
+    # storing the receivers email address
+    msg['To'] = toaddr
+    msg['To'] = toaddr2
 
-        # storing the subject
-        msg['Subject'] = f"Scrapped Data for {keyword}"
+    # storing the subject
+    msg['Subject'] = f"Scrapped Data for {keyword}"
 
-        # string to store the body of the mail
-        body = "Here is the attached file for the specified position "
+    # string to store the body of the mail
+    body = "Here is the attached file for the specified position "
 
-        # attach the body with the msg instance
-        msg.attach(MIMEText(body, 'plain'))
+    # attach the body with the msg instance
+    msg.attach(MIMEText(body, 'plain'))
 
-        # open the file to be sent
-        script_dir = os.path.dirname(__file__)
-        file = os.path.join(script_dir, data_csv)
-        attachment = open(file, "rb")
+    # open the file to be sent
+    script_dir = os.path.dirname(__file__)
+    file = os.path.join(script_dir, data_csv)
+    attachment = open(file, "rb")
 
-        # instance of MIMEBase and named as p
-        p = MIMEBase('application', 'octet-stream')
+    # instance of MIMEBase and named as p
+    p = MIMEBase('application', 'octet-stream')
 
-        # To change the payload into encoded formsaqsdfghjkl;'
-        p.set_payload(attachment.read())
+    # To change the payload into encoded formsaqsdfghjkl;'
+    p.set_payload(attachment.read())
 
-        # encode into base64
-        encoders.encode_base64(p)
-        p.add_header(f"Content-Disposition", f"attachment; filename={data_csv}")
-        # p.add_header('Content-Disposition', "attachment; filename= %s" % filename)
+    # encode into base64
+    encoders.encode_base64(p)
+    p.add_header(f"Content-Disposition", f"attachment; filename={data_csv}")
+    # p.add_header('Content-Disposition', "attachment; filename= %s" % filename)
 
-        # attach the instance 'p' to instance 'msg'
-        msg.attach(p)
+    # attach the instance 'p' to instance 'msg'
+    msg.attach(p)
 
-        # creates SMTP session
-        s = smtplib.SMTP('smtp.gmail.com', 587)
+    # creates SMTP session
+    s = smtplib.SMTP('smtp.gmail.com', 587)
 
-        # start TLS for security
-        s.starttls()
+    # start TLS for security
+    s.starttls()
 
-        # Authentication
-        s.login(fromaddr, "lqglrrtepepxamvz")
+    # Authentication
+    s.login(fromaddr, "lqglrrtepepxamvz")
 
-        # for specific password
-        # https://myaccount.google.com/security?rapt=AEjHL4PlAh6rv38PgIokqo4MNOKXlPRfjcyZlgvwF4by81rOQ8XUhwWJnn12AzOa5
-        # VS-vGqITVfOyHZQzutJNc-grjyjZtI4sQ
+    # for specific password
+    # https://myaccount.google.com/security?rapt=AEjHL4PlAh6rv38PgIokqo4MNOKXlPRfjcyZlgvwF4by81rOQ8XUhwWJnn12AzOa5
+    # VS-vGqITVfOyHZQzutJNc-grjyjZtI4sQ
 
-        print("login success")
-        # Converts the Multipart msg into a string
-        text = msg.as_string()
+    print("login success")
+    # Converts the Multipart msg into a string
+    text = msg.as_string()
 
-        # sending the mail
-        s.sendmail(fromaddr, toaddr, text)
-        s.sendmail(fromaddr, toaddr2, text)
+    # sending the mail
+    s.sendmail(fromaddr, toaddr, text)
+    s.sendmail(fromaddr, toaddr2, text)
 
-        # terminating the session
-        s.quit()
+    # terminating the session
+    s.quit()
 
-        print("sent . . .")
+    print("sent . . .")
+
 
 class JobsScrapping:
+
     __slots__ = "staff_url", "jobfinder_url", "i_job", "hr_url", "careercenter", "myjob", 'data_csv', 'keyword'
 
     def __init__(self, staff_url, jobfinder_url, i_job, hr_url, careercenter, myjob, data_csv, keyword):
@@ -116,17 +117,17 @@ class JobsScrapping:
                 'category', 'location', 'job_link'])
             csv_writer.writeheader()
             self.staff_am_scrap(csv_writer, 15)
-            # self.hr_am_scrap(csv_writer)
-            # self.jobfinder_am_scrap(csv_writer)
-            # self.i_job_scrap(csv_writer)
-            # self.careercenter_am_scrap(csv_writer)
-            # self.my_job_am(csv_writer)
+            self.hr_am_scrap(csv_writer)
+            self.jobfinder_am_scrap(csv_writer)
+            self.i_job_scrap(csv_writer)
+            self.careercenter_am_scrap(csv_writer)
+            self.my_job_am(csv_writer)
             finished = time.time()
             print(f"Search finished\nTime spent to search {finished - started:.2f} seconds"
                   f" or {(finished - started)/60:.2f} minutes")
 
-
-    def csv_writing(self, title, job_title_eng, company_name, deadline, employment_term, job_type,
+    @staticmethod
+    def csv_writing(title, job_title_eng, company_name, deadline, employment_term, job_type,
                     category, location, job_link, csv_writer):
         jobs_info = [{'title': title,
                       'job_title_eng': job_title_eng,
@@ -186,8 +187,8 @@ class JobsScrapping:
                                     location = elem_scd[5].strip()
                             self.csv_writing(title, job_title_eng, company_name, deadline, employment_term, job_type,
                                              category, location, job_link, csv_writer)
-                    except Exception as err:
-                        Exceptions(f"ERROR {err}")
+                    except Exception as er1:
+                        Exceptions(f"ERROR {er1}")
                         continue
         print('staff.am was scrapped successfully')
 
@@ -201,22 +202,22 @@ class JobsScrapping:
             find_title = job.select_one('td:nth-last-child(3)')
             try:
                 title = find_title.a.text.strip()
-            except Exception as err:
-                Exceptions(f"ERROR {err}")
+            except Exception as er5:
+                Exceptions(f"ERROR {er5}")
                 continue
             if self.keyword in title.lower():
                 company = job.select_one('td:nth-last-child(2)')
                 try:
                     company_name = company.span.text
-                except Exception as err:
-                    Exceptions(f"ERROR {err}")
+                except Exception as er6:
+                    Exceptions(f"ERROR {er6}")
                     continue
 
                 find_deadline = job.select_one('td:nth-child(3)')
                 try:
                     deadline = find_deadline.text.strip()
-                except Exception as err:
-                    Exceptions(f"ERROR {err}")
+                except Exception as er7:
+                    Exceptions(f"ERROR {er7}")
                     continue
 
                 find_job_link = job.select_one('td:nth-last-child(3)')
@@ -247,8 +248,8 @@ class JobsScrapping:
 
                     self.csv_writing(title, job_title_eng, company_name, deadline, employment_term, job_type,
                                      category, location, job_link, csv_writer)
-                except Exception as err:
-                    Exceptions(f"ERROR {err}")
+                except Exception as er4:
+                    Exceptions(f"ERROR {er4}")
                     continue
         print('jobfinder.am was scrapped successfully')
 
@@ -304,8 +305,8 @@ class JobsScrapping:
                 next_page.click()
                 time.sleep(4)
 
-            except Exception as err:
-                print(f"pages ended -- {err}")
+            except Exception as er3:
+                print(f"pages ended -- {er3}")
                 break
         print('hr.am was scrapped successfully')
 
@@ -332,8 +333,8 @@ class JobsScrapping:
                             deadline = find_deadline
                         else:
                             deadline = find_deadline[22:]
-                    except Exception as err:
-                        Exceptions(f"ERROR {err}")
+                    except Exception as er8:
+                        Exceptions(f"ERROR {er8}")
                         continue
 
                     job_link = f"https://careercenter.am/{job_info['href']}"
@@ -346,12 +347,12 @@ class JobsScrapping:
                             if elem.text.startswith("LOCATION:"):
                                 location = elem.text
                             elif elem.text.startswith("DURATION:"):
-                                employment_term = elem.text.split("DURATION:  ")[1].strip()
+                                employment_term = elem.text.split("DURATION:  ")[1].strip()
 
                         self.csv_writing(title, job_title_eng, company_name, deadline, employment_term, job_type,
                                          category, location, job_link, csv_writer)
-                    except Exception as err:
-                        Exceptions(f"ERROR {err}")
+                    except Exception as er2:
+                        Exceptions(f"ERROR {er2}")
                         continue
         print('careercenter.am was scrapped successfully')
 
@@ -364,7 +365,7 @@ class JobsScrapping:
         while source:
             try:
                 soup = BeautifulSoup(source, 'lxml')
-                for job in soup.find('div', class_="jobPageContainer"):
+                for job in soup.find_all('div', class_="jobPageContainer"):
                     job_link = f"https://www.myjob.am/{job['href']}"
                     # check if the next page is not loaded back again to the first page
                     if job_link not in chek_list:
@@ -381,8 +382,8 @@ class JobsScrapping:
                                              category, location, job_link, csv_writer)
                     else:
                         scrap_end = stop_here
-            except Exception as err:
-                print(f"ERROR {err}")
+            except Exception as er:
+                print(f"ERROR {er}")
                 break
 
             if scrap_end == stop_here:
@@ -404,20 +405,17 @@ if __name__ == "__main__":
     My_job_url = "https://www.myjob.am/?pg={}"
     Keyword = input("Hint: keywords examples: intern, accountant, lawyer, engineer,"
                     " administrator, python\n\nPlease fill position:  ")
-    e_mail_info = ""
+    e_mail_info = "Invalid Email"
     while True:
         e_mail_info = input("Please write your e-mail to send already scrapped data to:\n")
-        try:
-            if mail_checker(e_mail_info) == "Valid Email":
-                break
-        except:
-            print("Please write correct e-mail\n")
-
+        if mail_checker(e_mail_info) == "Invalid Email":
+            print("Please write correct e-mail")
             continue
+        break
 
     started = time.time()
     Data_csv = f"{Keyword}_Jobs.csv"
-    res = JobsScrapping(Staff_url, Jobfinder_url, I_job, Hr_url, Careercenter, My_job_url, Data_csv, Keyword)
+    res = JobsScrapping(Staff_url, Jobfinder_url, I_job, Hr_url, Careercenter, My_job_url, Data_csv,
+                        Keyword)
     res.csv_file_open()
-    sending = SendToMail()
-    sending.send_mail(Data_csv, Keyword, e_mail_info)
+    send_mail(Data_csv, Keyword, e_mail_info)

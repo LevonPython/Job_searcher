@@ -17,85 +17,6 @@ class Exceptions(Exception):
     pass
 
 
-def mail_checker(email):
-    regex = r"^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$"
-    # pass the regualar expression and the string in search() method
-    if re.search(regex, email):
-        return "Valid Email"
-    else:
-        return "Invalid Email"
-
-
-def send_mail(data_csv, keyword, e_mail_data):
-    fromaddr = "levon.python@gmail.com"
-    toaddr = e_mail_data    # "levoncdpf@gmail.com"
-    toaddr2 = "lidamuradyan01@gmail.com"
-
-    # instance of MIMEMultipart
-    msg = MIMEMultipart()
-
-    # storing the senders email address
-    msg['From'] = fromaddr
-
-    # storing the receivers email address
-    msg['To'] = toaddr
-    msg['To'] = toaddr2
-
-    # storing the subject
-    msg['Subject'] = f"Scrapped Data for {keyword}"
-
-    # string to store the body of the mail
-    body = "Here is the attached file for the specified position "
-
-    # attach the body with the msg instance
-    msg.attach(MIMEText(body, 'plain'))
-
-    # open the file to be sent
-    script_dir = os.path.dirname(__file__)
-    file = os.path.join(script_dir, data_csv)
-    attachment = open(file, "rb")
-
-    # instance of MIMEBase and named as p
-    p = MIMEBase('application', 'octet-stream')
-
-    # To change the payload into encoded formsaqsdfghjkl;'
-    p.set_payload(attachment.read())
-
-    # encode into base64
-    encoders.encode_base64(p)
-    p.add_header(f"Content-Disposition", f"attachment; filename={data_csv}")
-    # p.add_header('Content-Disposition', "attachment; filename= %s" % filename)
-
-    # attach the instance 'p' to instance 'msg'
-    msg.attach(p)
-
-    # creates SMTP session
-    s = smtplib.SMTP('smtp.gmail.com', 587)
-
-    # start TLS for security
-    s.starttls()
-
-    # Authentication
-    s.login(fromaddr, "lqglrrtepepxamvz")
-
-    # for specific password
-    # https://myaccount.google.com/security?rapt=AEjHL4PlAh6rv38PgIokqo4MNOKXlPRfjcyZlgvwF4by81rOQ8XUhwWJnn12AzOa5
-    # VS-vGqITVfOyHZQzutJNc-grjyjZtI4sQ
-
-    print("login success")
-    # Converts the Multipart msg into a string
-    text = msg.as_string()
-
-    # sending the mail
-    s.sendmail(fromaddr, toaddr, text)
-    s.sendmail(fromaddr, toaddr2, text)
-
-    # terminating the session
-    s.quit()
-
-    print("sent . . .")
-
-
 class JobsScrapping:
 
     __slots__ = "staff_url", "jobfinder_url", "i_job", "hr_url", "careercenter", "myjob", 'data_csv', 'keyword'
@@ -392,6 +313,66 @@ class JobsScrapping:
             source = requests.get(self.myjob.format(page_num)).text
             print(page_num)
         print('myjob.am was scrapped successfully')
+
+
+def mail_checker(email):
+    regex = r"^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$"
+    # pass the regualar expression and the string in search() method
+    if re.search(regex, email):
+        return "Valid Email"
+    else:
+        return "Invalid Email"
+
+
+def send_mail(data_csv, keyword, e_mail_data):
+    fromaddr = "levon.python@gmail.com"
+    toaddr = e_mail_data  # "levoncdpf@gmail.com"
+    toaddr2 = "lidamuradyan01@gmail.com"
+    # instance of MIMEMultipart
+    msg = MIMEMultipart()
+    # storing the senders email address
+    msg['From'] = fromaddr
+    # storing the receivers email address
+    msg['To'] = toaddr
+    msg['To'] = toaddr2
+    # storing the subject
+    msg['Subject'] = f"Scrapped Data for {keyword}"
+    # string to store the body of the mail
+    body = "Here is the attached file for the specified position "
+    # attach the body with the msg instance
+    msg.attach(MIMEText(body, 'plain'))
+    # open the file to be sent
+    script_dir = os.path.dirname(__file__)
+    file = os.path.join(script_dir, data_csv)
+    attachment = open(file, "rb")
+    # instance of MIMEBase and named as p
+    p = MIMEBase('application', 'octet-stream')
+    # To change the payload into encoded formsaqsdfghjkl;'
+    p.set_payload(attachment.read())
+    # encode into base64
+    encoders.encode_base64(p)
+    p.add_header(f"Content-Disposition", f"attachment; filename={data_csv}")
+    # p.add_header('Content-Disposition', "attachment; filename= %s" % filename)
+    # attach the instance 'p' to instance 'msg'
+    msg.attach(p)
+    # creates SMTP session
+    s = smtplib.SMTP('smtp.gmail.com', 587)
+    # start TLS for security
+    s.starttls()
+    # Authentication
+    s.login(fromaddr, "lqglrrtepepxamvz")
+    # for specific password
+    # https://myaccount.google.com/security?rapt=AEjHL4PlAh6rv38PgIokqo4MNOKXlPRfjcyZlgvwF4by81rOQ8XUhwWJnn12AzOa5
+    # VS-vGqITVfOyHZQzutJNc-grjyjZtI4sQ
+    print("login success")
+    # Converts the Multipart msg into a string
+    text = msg.as_string()
+    # sending the mail
+    s.sendmail(fromaddr, toaddr, text)
+    s.sendmail(fromaddr, toaddr2, text)
+    # terminating the session
+    s.quit()
+    print("sent . . .")
 
 
 if __name__ == "__main__":

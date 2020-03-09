@@ -7,3 +7,5 @@ Installations:
 1. First unpack the chromedriver.rar file for right working of scripts.
 2. Then install the packages needed for script work from packages.txt
 3. Run the code from job_searching.py, or job_searching - advanced_mode.py.
+
+© Armenia

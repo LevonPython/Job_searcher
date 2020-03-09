@@ -18,7 +18,6 @@ class Exceptions(Exception):
 
 
 class JobsScrapping:
-
     __slots__ = "staff_url", "jobfinder_url", "i_job", "hr_url", "careercenter", "myjob", 'data_csv', 'keyword'
 
     def __init__(self, staff_url, jobfinder_url, i_job, hr_url, careercenter, myjob, data_csv, keyword):
@@ -44,8 +43,7 @@ class JobsScrapping:
             self.careercenter_am_scrap(csv_writer)
             self.my_job_am(csv_writer)
             finished = time.time()
-            print(f"Search finished\nTime spent to search {finished - started:.2f} seconds"
-                  f" or {(finished - started)/60:.2f} minutes")
+            print(f"Minutes spent to search {(finished - started)/60:.2f}")
 
     @staticmethod
     def csv_writing(title, job_title_eng, company_name, deadline, employment_term, job_type,
@@ -65,6 +63,7 @@ class JobsScrapping:
 
     def staff_am_scrap(self, csv_writer, step=50, title='', deadline='', employment_term='',
                        job_type='', category='', location=''):
+        print("started ...")
 
         for page in range(0, step):
             source = requests.get(self.staff_url.format(page + 1)).text
@@ -78,10 +77,15 @@ class JobsScrapping:
                     job_link = f"https://staff.am{link}"
                     job_title_eng = link.split('en/')[1].lower()
                     try:
-                        if self.keyword in job_title_eng:
-                            # openning each job announcment link
-                            url_open = requests.get(job_link).text
-                            url_soup = BeautifulSoup(url_open, 'lxml')
+                        # openning each job announcment link
+                        url_open = requests.get(job_link).text
+                        url_soup = BeautifulSoup(url_open, 'lxml')
+                        # if content includes a keyword not in position but in Required qualifications
+                        find_skills = url_soup.find("div", class_="soft-skills-list clearfix")
+                        prof = find_skills.text.strip('  ').lower().split()
+                        # CHECK the keyword
+                        if (self.keyword in prof) or (self.keyword in job_title_eng):
+                            # grap necessary info from each announcement
                             company_name = url_soup.find('h1', class_="job_company_title").text
                             title_origin = url_soup.find_all('div', class_="col-lg-8")
                             for k in range(len(title_origin)):
@@ -108,10 +112,10 @@ class JobsScrapping:
                                     location = elem_scd[5].strip()
                             self.csv_writing(title, job_title_eng, company_name, deadline, employment_term, job_type,
                                              category, location, job_link, csv_writer)
-                    except Exception as er1:
-                        Exceptions(f"ERROR {er1}")
+                    except Exception as err:
+                        Exceptions(f"ERROR {err}")
                         continue
-        print('staff.am was scrapped successfully')
+        print("staff.am scraped successfully")
 
     def jobfinder_am_scrap(self, csv_writer, job_title_eng=''):
         source = requests.get(self.jobfinder_url).text
@@ -123,32 +127,34 @@ class JobsScrapping:
             find_title = job.select_one('td:nth-last-child(3)')
             try:
                 title = find_title.a.text.strip()
-            except Exception as er5:
-                Exceptions(f"ERROR {er5}")
+            except Exception as err:
+                Exceptions(f"ERROR {err}")
                 continue
-            if self.keyword in title.lower():
-                company = job.select_one('td:nth-last-child(2)')
-                try:
-                    company_name = company.span.text
-                except Exception as er6:
-                    Exceptions(f"ERROR {er6}")
-                    continue
 
-                find_deadline = job.select_one('td:nth-child(3)')
-                try:
-                    deadline = find_deadline.text.strip()
-                except Exception as er7:
-                    Exceptions(f"ERROR {er7}")
-                    continue
+            company = job.select_one('td:nth-last-child(2)')
+            try:
+                company_name = company.span.text
+            except Exception as err:
+                Exceptions(f"ERROR {err}")
+                continue
+            find_deadline = job.select_one('td:nth-child(3)')
+            try:
+                deadline = find_deadline.text.strip()
+            except Exception as err:
+                Exceptions(f"ERROR {err}")
+                continue
+            find_job_link = job.select_one('td:nth-last-child(3)')
+            try:
+                job_link = 'http://jobfinder.am/{}'.format(
+                    find_job_link.find('a', title="Display in new window")['href'])
+                # opening each job description
+                open_job_link = requests.get(job_link).text
+                job_soup = BeautifulSoup(open_job_link, 'lxml')
 
-                find_job_link = job.select_one('td:nth-last-child(3)')
-                try:
-                    job_link = 'http://jobfinder.am/{}'.format(
-                        find_job_link.find('a', title="Display in new window")['href'])
-
-                    # opening each job description
-                    open_job_link = requests.get(job_link).text
-                    job_soup = BeautifulSoup(open_job_link, 'lxml')
+                # if content includes a keyword not in position but in Required qualifications
+                req_qual = job_soup.find(
+                    'span', id="ctl00_bdyPlaceHolde_jfpanelViewJob_jfJobPreview_lblRequiredQualifications").text
+                if self.keyword in req_qual.lower() or self.keyword in title.lower():
                     table = job_soup.find('table', class_="fieldtable")
                     location = table.find(
                         'span', id="ctl00_bdyPlaceHolde_jfpanelViewJob_jfJobPreview_lblLocation").text
@@ -166,21 +172,20 @@ class JobsScrapping:
                         employment_term = "Permanent"
                     else:
                         employment_term = "Other"
-
                     self.csv_writing(title, job_title_eng, company_name, deadline, employment_term, job_type,
                                      category, location, job_link, csv_writer)
-                except Exception as er4:
-                    Exceptions(f"ERROR {er4}")
-                    continue
-        print('jobfinder.am was scrapped successfully')
+            except Exception as err:
+                Exceptions(f"ERROR {err}")
+                continue
+        print("jobfinder.am scraped successfully")
 
     def i_job_scrap(self, csv_writer, employment_term='', category=''):
-
         driver = webdriver.Chrome()
         driver.get(self.i_job.format(self.keyword))
         time.sleep(5)
-        for i in driver.find_elements_by_css_selector('#primary > div.container.content-area > div > div > ul > li'):
-            link = i.find_element_by_class_name('job_listing-clickbox')
+        for i in driver.find_elements_by_css_selector(
+                '#primary > div.container.content-area > div > div > ul > li'):
+            link = driver.find_element_by_class_name('job_listing-clickbox')
             job_link = link.get_attribute('href')
             job_info = i.text.split('\n')
             title = job_info[0]
@@ -189,95 +194,88 @@ class JobsScrapping:
             location = job_info[2]
             job_type = job_info[3]
             deadline = job_info[-1][7:].strip()
-
             self.csv_writing(title, job_title_eng, company_name, deadline, employment_term, job_type,
                              category, location, job_link, csv_writer)
-        print('i.job was scrapped successfully')
+        print("ijob.am scraped successfully")
 
-    def hr_am_scrap(self, csv_writer, job_title_eng='', employment_term='', job_type='', category='', location=''):
-
+    def hr_am_scrap(self, csv_writer, job_title_eng='', employment_term='',
+                    job_type='', category='', location=''):
         driver = webdriver.Chrome()
         driver.get(self.hr_url)
         time.sleep(5)
         page_num = 1
         next_page = driver.find_element_by_css_selector('div#vacancy_pagination > a:nth-child({})'.format(page_num))
         while next_page:
-            print(f"hr.am page number - {page_num}")
+            print(f"page number - {page_num}")
             try:
                 for i in driver.find_elements_by_css_selector('section#vacancy_wrapper div.vacancy-item'):
                     desc = i.text.split('\n')
                     title = ','.join(desc[:-3]).lower().strip()
-
                     if self.keyword in title:
                         i.click()
                         time.sleep(3)
                         find_link = i.find_element_by_css_selector(
                             'section#vacancy_wrapper div.vacancy-description > a')
                         job_link = find_link.get_attribute('href')
-
                         company_name = desc[-3]
                         deadline = desc[-1]
-
                         self.csv_writing(title, job_title_eng, company_name, deadline, employment_term, job_type,
                                          category, location, job_link, csv_writer)
                 page_num += 1
                 next_page = driver.find_element_by_css_selector(
                     'div#vacancy_pagination > a:nth-child({})'.format(page_num))
                 next_page.click()
-                time.sleep(4)
-
-            except Exception as er3:
-                print(f"pages ended -- {er3}")
+                time.sleep(3)
+            except Exception as err:
+                print(f"pages ended -- {err}")
                 break
-        print('hr.am was scrapped successfully')
+        print("hr.am scraped successfully")
 
-    def careercenter_am_scrap(self, csv_writer, employment_term='', job_type='', category='', location=''):
+    def careercenter_am_scrap(self, csv_writer, employment_term='', job_type='',
+                              category='', location=''):
         source = requests.get(self.careercenter)
-        # content = source.content
-        # res_ascii = content.decode('ascii')
-        soup = BeautifulSoup(source.text, 'html.parser')
+        content = source.content
+        res_ascii = content.decode('ascii')
+        soup = BeautifulSoup(res_ascii, 'lxml')
         for job in soup.select('tr'):
             job_info = job.select_one('td>a')
 
             if job_info is not None:
                 job_splitted = job_info.text.split(" / ")
                 title = job_splitted[0]
+                job_title_eng = title
+                company_name = job_splitted[1]
 
-                # CHECK the keyword
-                if self.keyword in title.lower().strip():
-                    job_title_eng = title
-                    company_name = job_splitted[1]
-
-                    try:
-                        find_deadline = job_info['title']
-                        if not find_deadline[20] == ':':
-                            deadline = find_deadline
-                        else:
-                            deadline = find_deadline[22:]
-                    except Exception as er8:
-                        Exceptions(f"ERROR {er8}")
-                        continue
-
-                    job_link = f"https://careercenter.am/{job_info['href']}"
-                    open_job = requests.get(job_link)
-                    new_content = open_job.content
-                    try:
-                        new_res = new_content.decode('ascii')
-                        new_soup = BeautifulSoup(new_res, 'lxml')
-                        for elem in new_soup.select('p'):
+                try:
+                    find_deadline = job_info['title']
+                    if not find_deadline[20] == ':':
+                        deadline = find_deadline
+                    else:
+                        deadline = find_deadline[22:]
+                except Exception as err:
+                    Exceptions(f"ERROR {err}")
+                    continue
+                job_link = f"https://careercenter.am/{job_info['href']}"
+                open_job = requests.get(job_link)
+                new_content = open_job.content
+                try:
+                    new_res = new_content.decode('ascii')
+                    new_soup = BeautifulSoup(new_res, 'lxml')
+                    for elem in new_soup.select('p'):
+                        # if content includes a keyword not in position but in Required qualifications
+                        if self.keyword in elem.text.lower():
                             if elem.text.startswith("LOCATION:"):
                                 location = elem.text
                             elif elem.text.startswith("DURATION:"):
                                 employment_term = elem.text.split("DURATION:  ")[1].strip()
+                            self.csv_writing(title, job_title_eng, company_name, deadline, employment_term, job_type,
+                                             category, location, job_link, csv_writer)
+                except Exception as err:
+                    Exceptions(f"ERROR {err}")
+                    continue
+        print("careercenter.am scraped successfully")
 
-                        self.csv_writing(title, job_title_eng, company_name, deadline, employment_term, job_type,
-                                         category, location, job_link, csv_writer)
-                    except Exception as er2:
-                        Exceptions(f"ERROR {er2}")
-                        continue
-        print('careercenter.am was scrapped successfully')
-
-    def my_job_am(self, csv_writer, employment_term='', job_type='', category=''):
+    def my_job_am(self, csv_writer, employment_term='', job_type=''):
         page_num = 1
         source = requests.get(self.myjob.format(page_num)).text
         chek_list = []
@@ -286,25 +284,29 @@ class JobsScrapping:
         while source:
             try:
                 soup = BeautifulSoup(source, 'lxml')
-                for job in soup.find_all('div', class_="jobPageContainer"):
+                for job in soup.find('div', class_="jobPageContainer"):
                     job_link = f"https://www.myjob.am/{job['href']}"
                     # check if the next page is not loaded back again to the first page
                     if job_link not in chek_list:
                         chek_list.append(job_link)
                         title = job.find('div', class_="shortJobPosition").text
-                        if self.keyword in title.lower():
-                            print("Matches")
-                            job_title_eng = title
-                            company_name = job.find('div', class_='shortJobCompany').text
-                            deadline = job.find('div', class_="shortJobDeadline").text
-                            location = job.find('div', class_="shortJobRightPart").text
-
-                            self.csv_writing(title, job_title_eng, company_name, deadline, employment_term, job_type,
-                                             category, location, job_link, csv_writer)
+                        job_title_eng = title
+                        company_name = job.find('div', class_='shortJobCompany').text
+                        location = job.find('div', class_="shortJobRightPart").text
+                        # grap from each job page
+                        job_source = requests.get(job_link).text
+                        job_soup = BeautifulSoup(job_source, 'lxml')
+                        find_category = job_soup.find('div', class_="fullJobTextsShort").text
+                        category = find_category.split(location)[0]
+                        deadline = find_category.split(location)[1]
+                        for i in job_soup.find_all('div', class_="fullJobTextLong"):
+                            if self.keyword in i.text.lower():
+                                self.csv_writing(title, job_title_eng, company_name, deadline, employment_term,
+                                                 job_type, category, location, job_link, csv_writer)
                     else:
                         scrap_end = stop_here
-            except Exception as er:
-                print(f"ERROR {er}")
+            except Exception as err:
+                print(f"ERROR {err}")
                 break
 
             if scrap_end == stop_here:
@@ -312,7 +314,7 @@ class JobsScrapping:
             page_num += 1
             source = requests.get(self.myjob.format(page_num)).text
             print(page_num)
-        print('myjob.am was scrapped successfully')
+        print("myjob.am scraped successfully")
 
 
 def mail_checker(email):

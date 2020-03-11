@@ -10,5 +10,6 @@ https://sites.google.com/a/chromium.org/chromedriver/downloads
 2. Then install the packages needed for script work from packages.txt
 
 3. Run the code from job_searching.py, or job_searching - advanced_mode.py.
+Here is the test video link: https://www.youtube.com/watch?v=1jTUdzluhkw
 
 © Armenia

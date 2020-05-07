@@ -26,9 +26,10 @@ Installing
 ==========
 1. First unpack the chromedriver.rar file for right working of scripts or choose the version appropriate to your browser.
 https://sites.google.com/a/chromium.org/chromedriver/downloads
-.. image:: https://github.com/LevonPython/Job_search/blob/master/chromedriver_hint.png
-   :target: https://github.com/LevonPython/Job_search
-   :alt: Chrome Driver installing hint   
+.. image:: https://github.com/LevonPython/Job_search/blob/master/jobsearcher%20logo.png
+   :align: center
+   :target: http://kayqer.am/hy/ashxatanq/
+   :alt: Job Searcher Logot   
 
 
 2. Then install the packages needed for script work from packages.txt
@@ -65,5 +66,6 @@ https://careercenter.am/ru
 https://www.myjob.am/
 ---------------
 
-
+===============
 © Armenia
+===============

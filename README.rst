@@ -26,6 +26,10 @@ Installing
 ==========
 1. First unpack the chromedriver.rar file for right working of scripts or choose the version appropriate to your browser.
 https://sites.google.com/a/chromium.org/chromedriver/downloads
+.. image:: hhttps://github.com/LevonPython/Job_search/blob/master/chromedriver_hint.pngng
+   :align: left
+   :alt: Chrome Driver installing hint
+
 
 2. Then install the packages needed for script work from packages.txt
 
@@ -42,7 +46,10 @@ Here is the test video link: https://www.youtube.com/watch?v=1jTUdzluhkw
 ===============
 source websites
 ===============
-https://staff.am/am/,
+---------------
+https://staff.am/am/
+---------------
+https://staff.am/am/
 http://jobfinder.am/,
 http://ijob.am/,
 http://hr.am/,

@@ -26,9 +26,9 @@ Installing
 ==========
 1. First unpack the chromedriver.rar file for right working of scripts or choose the version appropriate to your browser.
 https://sites.google.com/a/chromium.org/chromedriver/downloads
-.. image:: hhttps://github.com/LevonPython/Job_search/blob/master/chromedriver_hint.pngng
+.. image:: https://github.com/LevonPython/Job_search/blob/master/chromedriver_hint.png
    :align: left
-   :target: None
+   :target: https://github.com/LevonPython/Job_search/blob/master/chromedriver_hint.png
    :alt: Chrome Driver installing hint
 
 

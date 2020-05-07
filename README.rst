@@ -16,10 +16,10 @@ Job searcher
 ====================
 Introduction
 ====================
-Searching an job announcements by keyword of position in several `source websites`_ and get it to your e-mail in csv file format (matching of not only position title but also words in required qualifications.
+Searching job announcements by keyword of position in several `source websites`_ and send it to your e-mail in csv file format (searching not only work position but also words in required qualifications.
 
 In short , 
-if you want to find a exact job, you just run the code, input preferred position, your e-mail and get csv file in 2-3 minutes.
+if you want to find an exact job, you just run the code, write preferred position, your e-mail and get csv file in 2-3 minutes.
 
 ==========
 Installing

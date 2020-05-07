@@ -28,6 +28,7 @@ Installing
 https://sites.google.com/a/chromium.org/chromedriver/downloads
 .. image:: hhttps://github.com/LevonPython/Job_search/blob/master/chromedriver_hint.pngng
    :align: left
+   :target: None
    :alt: Chrome Driver installing hint
 
 
@@ -48,6 +49,11 @@ source websites
 ===============
 ---------------
 https://staff.am/am/
+http://jobfinder.am/,
+http://ijob.am/,
+http://hr.am/,
+https://careercenter.am/ru,
+https://www.myjob.am/
 ---------------
 https://staff.am/am/
 http://jobfinder.am/,
@@ -55,6 +61,7 @@ http://ijob.am/,
 http://hr.am/,
 https://careercenter.am/ru,
 https://www.myjob.am/
+---------------
 
 
 

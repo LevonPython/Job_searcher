@@ -1,0 +1,54 @@
+.. image:: https://github.com/python-telegram-bot/logos/blob/master/logo-text/png/ptb-logo-text_768.png?raw=true
+   :align: center
+   :target: http://kayqer.am/hy/ashxatanq/
+   :alt: Job Searcher Logo
+====================
+Job searcher
+====================
+
+- `Introduction`_
+
+- `Installing`_
+
+- `Getting started`_
+
+- `Learning by example`_
+====================
+Introduction
+====================
+Searching an job announcements by keyword of position in several `source websites`_ and get it to your e-mail in csv file format (matching of not only position title but also words in required qualifications.
+
+In short , 
+if you want to find a exact job, you just run the code, input preferred position, your e-mail and get csv file in 2-3 minutes.
+
+==========
+Installing
+==========
+1. First unpack the chromedriver.rar file for right working of scripts or choose the version appropriate to your browser.
+https://sites.google.com/a/chromium.org/chromedriver/downloads
+
+2. Then install the packages needed for script work from packages.txt
+
+===============
+Getting started
+===============
+Run the code from job_searching.py, or job_searching - advanced_mode.py.
+
+===============
+Learning by example
+===============
+Here is the test video link: https://www.youtube.com/watch?v=1jTUdzluhkw
+
+===============
+source websites
+===============
+https://staff.am/am/
+http://jobfinder.am/
+http://ijob.am/
+http://hr.am/
+https://careercenter.am/ru
+https://www.myjob.am/
+
+
+
+© Armenia

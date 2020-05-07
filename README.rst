@@ -1,4 +1,4 @@
-.. image:: https://github.com/python-telegram-bot/logos/blob/master/logo-text/png/ptb-logo-text_768.png?raw=true
+.. image:: https://github.com/LevonPython/Job_search/blob/master/jobsearcher%20logo.png
    :align: center
    :target: http://kayqer.am/hy/ashxatanq/
    :alt: Job Searcher Logo
@@ -42,11 +42,11 @@ Here is the test video link: https://www.youtube.com/watch?v=1jTUdzluhkw
 ===============
 source websites
 ===============
-https://staff.am/am/
-http://jobfinder.am/
-http://ijob.am/
-http://hr.am/
-https://careercenter.am/ru
+https://staff.am/am/,
+http://jobfinder.am/,
+http://ijob.am/,
+http://hr.am/,
+https://careercenter.am/ru,
 https://www.myjob.am/
 
 

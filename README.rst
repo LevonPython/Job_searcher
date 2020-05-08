@@ -16,11 +16,9 @@ Job searcher
 ====================
 Introduction
 ====================
-Searching job announcements by keyword of position in several `source websites`_ and send it to your e-mail in csv file format (searching not only work position but also words in required qualifications.
+The application was writed for job seekers who are in the process of constantly finding a job. The main purpose of creating the program was to save time by collecting daily vacancies from source websites. The program allows you to receive collective information of preferences in the preferred profession in the pre-specified e-mail address in csv (xlsx).
 
-In short , 
-if you want to find an exact job, you just run the code, write preferred position, your e-mail and get csv file in 2-3 minutes.
-
+Alternatively, if you are looking for a specific job, just run the code, write your preferred position, your email address, and get the information you need in your own csv email in just 2-3 minutes.
 ==========
 Installing
 ==========

@@ -48,3 +48,21 @@ Here is the test video link: https://www.youtube.com/watch?v=1jTUdzluhkw
 source websites
 ===============
 
+---------------
+https://staff.am/am/
+---------------
+---------------
+http://jobfinder.am/
+---------------
+---------------
+http://ijob.am/
+---------------
+---------------
+http://hr.am/
+---------------
+---------------
+https://careercenter.am/ru
+---------------
+---------------
+https://www.myjob.am/
+---------------

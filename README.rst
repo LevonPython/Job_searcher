@@ -39,3 +39,12 @@ Getting started
 ===============
 Run the code from job_searching.py, or job_searching - advanced_mode.py.
 
+===============
+Learning by example
+===============
+Here is the test video link: https://www.youtube.com/watch?v=1jTUdzluhkw
+
+===============
+source websites
+===============
+

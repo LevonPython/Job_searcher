@@ -49,9 +49,8 @@ source websites
 ===============
 
 ---------------
-https://staff.am/am/
+https://www.staff.am/am/
 ---------------
-
 
 
 ===============
